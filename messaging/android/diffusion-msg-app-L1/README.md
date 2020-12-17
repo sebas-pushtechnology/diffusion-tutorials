@@ -15,12 +15,12 @@ In Diffusion, data is stored and distributed through Topics. Session can subscri
 # APIs used in this application
 
 ## **Step 1: Connect to Diffusion**
-### [Diffusion.sessions()](https://docs.pushtechnology.com/docs/6.6.0-preview.1/android/com/pushtechnology/diffusion/client/session/SessionFactory.html) > [*create your host*](https://management.ad.diffusion.cloud/)
+### [SessionFactory](https://docs.pushtechnology.com/docs/6.6.0-preview.1/android/com/pushtechnology/diffusion/client/session/SessionFactory.html) > [*create your host*](https://management.ad.diffusion.cloud/)
 Provided an Activity where we received userName, password, and difussionService (its URL) as part of the intent:
 ```java
 /* Session must be set in the Activity's onCreate function */
 protected void onCreate(Bundle savedInstanceState) {
-	/* sessionHandler is a private class where we handle the session, described in the NEXT STEP*/
+	/* sessionHandler is a private class where we handle the session, described in the NEXT STEP */
     private SessionHandler sessionHandler = null;
 	...
 	
@@ -60,7 +60,7 @@ private class SessionHandler implements SessionFactory.OpenCallback {
 }
 ```
 ### Go to: [Diffusion Cloud > Manage Service > Console > Topics](https://management.ad.diffusion.cloud/#!/login)
-We are seeting up `_roomTopic` with the topic path: `Chat/Default Room`
+We are seeting up `chatRoomName` with the topic path: `Chat/Default Room`
 ![](https://github.com/pushtechnology/tutorials/blob/master/messaging/diffusion-msg-app-L1/images/topics.png)
 
 ## **Step 3: Create a Topic Listener**
@@ -138,13 +138,13 @@ compileOptions {
  }
 ```
 
-In your project's app/src/main/AndroidManifest.xml, set the INTERNET permission.
+In your project's `app/src/main/AndroidManifest.xml`, set the INTERNET permission.
 
 ```java
 <uses-permission android:name="android.permission.INTERNET"/>;
 ```
 
-Al that's left to do, is to add you own credentials to the Difussion.session() command, as done in the ChatActivity.java file.
+All that's left to do, is to add you own credentials to the Difussion.session() command, as done in the ChatActivity.java file.
 
 You can also leave the default values and connect to our sandbox service:
 * host: host ("diffusionchatapp.eu.diffusion.cloud" by default)

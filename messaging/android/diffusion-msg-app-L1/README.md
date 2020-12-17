@@ -15,7 +15,7 @@ In Diffusion, data is stored and distributed through Topics. Session can subscri
 # APIs used in this application
 
 ## **Step 1: Connect to Diffusion**
-### [Diffusion.sessions()](https://docs.pushtechnology.com/docs/6.5.1/js/globals.html#connect) > [*create your host*](https://management.ad.diffusion.cloud/)
+### [Diffusion.sessions()](https://docs.pushtechnology.com/docs/6.6.0-preview.1/android/com/pushtechnology/diffusion/client/session/SessionFactory.html) > [*create your host*](https://management.ad.diffusion.cloud/)
 Provided an Activity where we received userName, password, and difussionService (its URL) as part of the intent:
 ```java
 /* Session must be set in the Activity's onCreate function */
@@ -24,17 +24,17 @@ protected void onCreate(Bundle savedInstanceState) {
     private SessionHandler sessionHandler = null;
 	...
 	
-	Diffusion.sessions()
-	        .principal(this.userName)
-	        .password(this.password)
+	Diffusion.sessions() //The sessions factory implementation
+	        .principal(this.userName) //The username to validate to the service
+	        .password(this.password) // The password
 	        // And we pass the sessionHandler instance to the session.
-	        .open("ws://" + this.diffusionService, this.sessionHandler);
+	        .open("ws://" + this.diffusionService, this.sessionHandler); //This is the funtion that actually opens a connection to the server
 	        /* Use your Diffusion service or connect to our sandbox "diffusionchatapp.eu.diffusion.cloud" */
     ...
 }
 ```
 ## **Step 2: Create a Topic**
-### [session.topics.add](https://docs.pushtechnology.com/docs/6.5.1/js/interfaces/topiccontrol.html#add)
+### [session.topics.addTopic](https://docs.pushtechnology.com/docs/6.6.0-preview.1/android/com/pushtechnology/diffusion/client/features/control/topics/TopicControl.html#addTopic-java.lang.String-com.pushtechnology.diffusion.client.topics.details.TopicType-)
 ```java
 /* This is the SessionHandler class to handle the diffusion service session */
 private class SessionHandler implements SessionFactory.OpenCallback {
@@ -65,7 +65,7 @@ We are seeting up `_roomTopic` with the topic path: `Chat/Default Room`
 
 ## **Step 3: Create a Topic Listener**
 In the **onOpened** function of the SessionHandlerClass, add the Stream we want to listen to
-### [session.addStream](https://docs.pushtechnology.com/docs/6.5.1/js/interfaces/session.html#addstream)
+### [session.addStream](https://docs.pushtechnology.com/docs/6.6.0-preview.1/android/com/pushtechnology/diffusion/client/features/Topics.html#addStream-java.lang.String-java.lang.Class-com.pushtechnology.diffusion.client.features.Topics.ValueStream-)
 ```java
 // Attach a Stream to listen for updates
 this.session.feature(Topics.class).addStream(this.chatRoomName, JSON.class, new Topics.ValueStream.Default<JSON>() {                
@@ -89,13 +89,13 @@ this.session.feature(Topics.class).addStream(this.chatRoomName, JSON.class, new 
 ```
 ## **Step 4: Subscribe to a Topic**
 Also from inside the **onOpened** function and **after** we started listening to the Stream, we subscribe to the topic. **chatRoomName**, was previously fed to the Activity via intent:
-### [session.select](https://docs.pushtechnology.com/docs/6.5.1/js/interfaces/session.html#select)
+### [session.subscribe](https://docs.pushtechnology.com/docs/6.6.0-preview.1/android/com/pushtechnology/diffusion/client/features/control/topics/SubscriptionControl.html)
 ```java
 // And we finally subscribe to the topic
 this.session.feature(Topics.class).subscribe(this.chatRoomName);
 ```
 ## **Step 5: Update a Topic**
-### [session.topicUpdate.set](https://docs.pushtechnology.com/docs/6.5.1/js/interfaces/topicupdate.html#set)
+### [session.topicUpdate.set](https://docs.pushtechnology.com/docs/6.6.0-preview.1/android/com/pushtechnology/diffusion/client/features/TopicUpdate.html)
 ```java
 // Convert it to a JSON value
 final JSON value = jsonDataType.fromJsonString(message.toString());

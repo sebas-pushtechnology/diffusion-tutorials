@@ -119,11 +119,33 @@ final CompletableFuture<?> result = this.sessionHandler.
 
 # Setup
 
-Make sure to add Diffusion library to your code. For JavaScript, we have added the following line in our `public/chat.html`:
+Download the Diffusion [Android client](https://download.pushtechnology.com/clients/6.6.0-preview.1/android/diffusion-android-6.6.0-preview.1.jar).
+
+In Android Studio, create a new project using API Level 19 or later, then copy the diffusion-android-6.6.0-preview.1.jar file to the app/libs directory in your project.
+
+Find the library by expanding the app/libs folder in the left-hand panel (the Project Tool Window). If the libs folder is not shown in the left-hand panel, use the pull-down menu at the top of the panel to select the Project view.
+
+Right-click on the jar, select **Add as Library...** then accept the default library settings.
+
+Right-click on the libs folder in the Project Tool Window, then select Add as Library. If the libs folder is not shown in the left-hand panel, use the pull-down menu at the top of the panel to select Project view.
+
+Add the following code to the build.gradle file within your project:
+
+```java
+compileOptions {
+  sourceCompatibility JavaVersion.VERSION_1_8
+  targetCompatibility JavaVersion.VERSION_1_8
+ }
 ```
-<script src='https://download.pushtechnology.com/clients/6.5.1/js/diffusion-6.5.1.js'></script>
+
+In your project's app/src/main/AndroidManifest.xml, set the INTERNET permission.
+
+```java
+<uses-permission android:name="android.permission.INTERNET"/>;
 ```
-Set lines 44-46 of `public/js/app.js` to the hostname of your Diffusion Cloud service, which you can find in your service dashboard.
+
+Al that's left to do, is to add you own credentials to the Difussion.session() command, as done in the ChatActivity.java file.
+
 You can also leave the default values and connect to our sandbox service:
 * host: host ("diffusionchatapp.eu.diffusion.cloud" by default)
 * user: 'user'
@@ -131,4 +153,4 @@ You can also leave the default values and connect to our sandbox service:
 
 # Execution
 
-Really easy, just open the index.html file locally and off you go!
+Use Android Studio's Run or Debug features to run the App.

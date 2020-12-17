@@ -20,7 +20,7 @@ Provided an Activity where we received userName, password, and difussionService 
 ```java
 /* Session must be set in the Activity's onCreate function */
 protected void onCreate(Bundle savedInstanceState) {
-	/* sessionHandler is a private class where we handle the session, described in the next Step*/
+	/* sessionHandler is a private class where we handle the session, described in the NEXT STEP*/
     private SessionHandler sessionHandler = null;
 	...
 	
@@ -35,32 +35,75 @@ protected void onCreate(Bundle savedInstanceState) {
 ```
 ## **Step 2: Create a Topic**
 ### [session.topics.add](https://docs.pushtechnology.com/docs/6.5.1/js/interfaces/topiccontrol.html#add)
-```js
-session.topics.add(_roomTopic, diffusion.topics.TopicType.JSON);
+```java
+/* This is the SessionHandler class to handle the diffusion service session */
+private class SessionHandler implements SessionFactory.OpenCallback {
+	/**
+         * This function is called when the session is Opened
+         * In this function we create the topic, and subscribe to it.
+         * Subscribing to it will allow us to listen to everything streamed into the Topic's channel
+         * @param session This is the session we created in the Activity's constructor
+         */
+        @Override
+        public void onOpened(Session session) {
+        	this.session = session;
+
+            // Here is where we add the topic to the session
+            this.session.feature(TopicControl.class).addTopic(
+                    this.chatRoomName,
+                    TopicType.JSON
+            );
+
+            // Attach a Stream to listen for updates (Step 3)
+            ...
+        }
+}
 ```
 ### Go to: [Diffusion Cloud > Manage Service > Console > Topics](https://management.ad.diffusion.cloud/#!/login)
 We are seeting up `_roomTopic` with the topic path: `Chat/Default Room`
 ![](https://github.com/pushtechnology/tutorials/blob/master/messaging/diffusion-msg-app-L1/images/topics.png)
 
 ## **Step 3: Create a Topic Listener**
+In the onOpened function of the SessionHandlerClass, add the Stream we want to listen to
 ### [session.addStream](https://docs.pushtechnology.com/docs/6.5.1/js/interfaces/session.html#addstream)
-```js
-session.addStream(_roomTopic, diffusion.datatypes.json());
+```java
+// Attach a Stream to listen for updates
+this.session.feature(Topics.class).addStream(this.chatRoomName, JSON.class, new Topics.ValueStream.Default<JSON>() {                
+    /**
+     * This function gets called when new data is read from the Topic's channel
+     * @param topicPath
+     * @param topicSpec
+     * @param oldValue
+     * @param newValue
+     */
+    @Override
+    public void onValue(String topicPath, TopicSpecification topicSpec, JSON oldValue, JSON newValue) {
+        System.out.println("New value for" + topicPath + ": " + newValue.toJsonString());
+        try {
+            receiveMessage(newValue);
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+        }
+    }
+});	
 ```
 ## **Step 4: Subscribe to a Topic**
+Also from inside the onOpened function and after we started listening to the Stream. 'chatRoomName', was previously fed to the Activity via intent:
 ### [session.select](https://docs.pushtechnology.com/docs/6.5.1/js/interfaces/session.html#select)
-```js
-session.select(_roomTopic);
+```java
+// And we finally subscribe to the topic
+this.session.feature(Topics.class).subscribe(this.chatRoomName);
 ```
 ## **Step 5: Update a Topic**
 ### [session.topicUpdate.set](https://docs.pushtechnology.com/docs/6.5.1/js/interfaces/topicupdate.html#set)
-```js
-session.topicUpdate.set(_roomTopic, diffusion.datatypes.json(),
-	{
-		text: msg,
-		name: name,
-		timestamp: new Date().toLocaleTimeString()
-	});
+```java
+// Convert it to a JSON value
+final JSON value = jsonDataType.fromJsonString(message.toString());
+
+// Now we send the message
+final CompletableFuture<?> result = this.sessionHandler.
+    getSession().feature(TopicUpdate.class).
+    set(this.sessionHandler.getSessionTopicName(), JSON.class, value);
 ```
 # The code in action
 [![Video Tutorial](https://github.com/pushtechnology/tutorials/blob/master/messaging/diffusion-msg-app-L1/images/code-example.png)](https://youtu.be/tTx8q4oPx7E?t=336)

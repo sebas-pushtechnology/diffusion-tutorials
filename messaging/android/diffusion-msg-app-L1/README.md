@@ -64,7 +64,7 @@ We are seeting up `_roomTopic` with the topic path: `Chat/Default Room`
 ![](https://github.com/pushtechnology/tutorials/blob/master/messaging/diffusion-msg-app-L1/images/topics.png)
 
 ## **Step 3: Create a Topic Listener**
-In the onOpened function of the SessionHandlerClass, add the Stream we want to listen to
+In the **onOpened** function of the SessionHandlerClass, add the Stream we want to listen to
 ### [session.addStream](https://docs.pushtechnology.com/docs/6.5.1/js/interfaces/session.html#addstream)
 ```java
 // Attach a Stream to listen for updates
@@ -88,7 +88,7 @@ this.session.feature(Topics.class).addStream(this.chatRoomName, JSON.class, new 
 });	
 ```
 ## **Step 4: Subscribe to a Topic**
-Also from inside the onOpened function and after we started listening to the Stream. 'chatRoomName', was previously fed to the Activity via intent:
+Also from inside the **onOpened** function and **after** we started listening to the Stream, we subscribe to the topic. **chatRoomName**, was previously fed to the Activity via intent:
 ### [session.select](https://docs.pushtechnology.com/docs/6.5.1/js/interfaces/session.html#select)
 ```java
 // And we finally subscribe to the topic

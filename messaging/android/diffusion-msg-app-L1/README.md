@@ -106,7 +106,7 @@ final CompletableFuture<?> result = this.sessionHandler.
     set(this.sessionHandler.getSessionTopicName(), JSON.class, value);
 ```
 # The code in action
-[![Video Tutorial](https://github.com/pushtechnology/tutorials/blob/master/messaging/diffusion-msg-app-L1/images/code-example.png)](https://youtu.be/tTx8q4oPx7E?t=336)
+[![Video Tutorial](https://github.com/sebas-pushtechnology/diffusion-tutorials/blob/main/messaging/android/images/tutorial_l1.png)](https://youtu.be/tTx8q4oPx7E?t=336)
 
 # Pre-requisites
 

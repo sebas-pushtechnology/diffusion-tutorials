@@ -1,5 +1,5 @@
 import Mosquitto from './mqtt-clients/Mosquitto.js';
-import DialogReader from './DialogReader.js';
+import DialogueReader from './DialogueReader.js';
 
 class Main {
     constructor() {
@@ -13,13 +13,13 @@ class Main {
      */
     onServerConnected = () => {
         console.log('Beginning Transmission. Stick to the right side of the Force');
-        this.dialogReader = new DialogReader(
+        this.dialogueReader = new DialogueReader(
             {
                 onLineCallback: dialogue => this.sendDialogueLine(dialogue),
                 onCloseCallback: () => this.onFinishedReadingDialogueFile()
             }
         );
-        this.dialogReader.readFile('./dialogues/episode_iv');
+        this.dialogueReader.readFile('./dialogues/episode_iv');
     }
 
     /**

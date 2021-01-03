@@ -8,12 +8,12 @@ export default class Mosquitto {
     }
 
     connect = () => {
-        this.client = mqtt.connect('mqtt://test.mosquitto.org');
-        /*this.client = mqtt.connect('tcp://localhost:8086', {
+        //this.client = mqtt.connect('mqtt://test.mosquitto.org');
+        this.client = mqtt.connect('tcp://localhost:8086', {
             protocolVersion: 5,
             username: 'admin',
             password: 'password'
-        })*/
+        })
         this.client.on('error', this.onConnectError);
         this.client.on('connect', this.onConnect);
         this.client.on('message', this.onReceivedDialogue);

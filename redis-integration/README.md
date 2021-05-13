@@ -26,13 +26,73 @@ This is where the magic happens, data received can be Enriched and Fine Grained 
 Finally we have a Diffusion client, consuming from the Diffusion Topic and showing in the chart the values it received.
 
 # The code in Action
-
 ## Connecting to diffusion
 1. Connecting is very easy, this is the function a consumer class in JS calls to connect. Read the comments in the function to understand what it does.
-![](./images/connect.png)
+```javascript
+/**
+     * This method is used to configure Diffusion connection
+     * @param host The host of the Diffusion Service
+     * @param user The user to the Diffusion Service
+     * @param password
+     * @param topic The topic name to be created and consumer from
+     */
+    setConfig = ({ host, user, password, topic }) => {         
+        this.host = host || '127.0.0.1';
+        this.user = user || 'admin';
+        this.password = password || 'password';
+        this.topic = topic || 'default-topic';
+        this.subscribedTopic = topic || 'default-topic';
+    }
+
+    /**
+     * Method that handles connection to the Diffusion Service      
+     */
+    connect = () => {
+        /* Connect to Diffusion using the parameters previously set in setConfig method */
+        diffusion.connect({
+            host: this.host,            
+            principal: this.user,
+            credentials: this.password,                       
+            port: 443,
+            secure: true
+        }).then((session) => {
+            this.session = session;
+            /* Here's where we add the topic we are going to be using */
+            this.session.topics.add(this.topic, diffusion.topics.TopicType.JSON)            
+            console.log(`Connected: `, this.session.sessionId);
+
+            /* If we setup a connected callback, let's call it */
+            if (this.onConnectedCallback) {
+                this.onConnectedCallback();
+            }            
+        });
+    }
+```
 
 2. After connecting, in order to start consuming from the Topic, we must subscribe to it, using the following function.
-![](./images/subscribe.png)
+```javascript
+/**
+     * Method to subscribe to a topic and start consuming it
+     * @param session We can pass an already existing session, otherwise it will use the internal one
+     * @param topicPath Set a topic to subscribe to, if empty uses the internal one
+     * @param onValueCallback callback to be called when a value is arrives in the topic. It can be null
+     */
+    subscribe = ({ session = undefined, topicPath = '', onValueCallback = null }) => {
+        const currentSession = session || this.session;
+        const currentTopic = topicPath || this.topic;
+        console.log(`subscribing to: ${currentTopic}`);
+        
+        /* We Setup the stream */
+        currentSession.addStream(
+            currentTopic,
+            diffusion.datatypes.json()).on('value',
+                onValueCallback || this.onReceiveMessage
+            );
+
+        /* And subscribe to the topic */
+        currentSession.select(currentTopic);
+    }
+```
 
 # Pre-requisites
 

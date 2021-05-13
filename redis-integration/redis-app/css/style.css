@@ -1,0 +1,52 @@
+.vertical-center {
+  min-height: 100vh;
+  margin: 0;
+  display: flex;
+  align-items: center;
+}
+.vertical-center .container-fluid {
+  flex-grow:1
+}
+h1 {
+  margin: 24px 0;
+}
+.messages p {
+  margin: 6px 0;
+}
+.mymessages {
+  text-align: right;
+  color: #2E6D88;
+  font-style: italic;
+}
+ul.messages.list-group {
+  max-height: 50vh;
+  overflow-y: scroll;
+}
+.typing {
+  font-style: italic;
+}
+.msg-delieverd {
+  text-shadow: 1px 1px 1px #ccc;
+  font-size: 1.5em;
+  color: #2F99F5;
+}
+.msg-read {
+  text-shadow: 1px 1px 1px #ccc;
+  font-size: 1.5em;
+  color: #2AC151;
+}
+
+.btn-diffusion {
+    font-size: 14px;
+    line-height: 20px;
+    font-style: normal;
+    color: #212529;
+    background: #4bade9 linear-gradient(180deg,#65b8ec,#4bade9) repeat-x;
+    border-color: #4bade9;
+}
+
+.btn-diffusion:hover {
+  color: #fff;
+  background: #299de5 linear-gradient(180deg,#48abe8,#299de5) repeat-x;
+  border-color: #1e98e3;
+}

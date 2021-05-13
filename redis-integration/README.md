@@ -16,8 +16,12 @@ In Redis we created a Topic to stream that data through, and we created a Redis 
 This is where data collected in redis is, published to Diffusion.
 ### Redis publisher
 The redis publisher, which is consuming data from the Redis Topic, in turn, publishes the same content to a Topic in Diffusion.
+### Diffusion Server
+This is where the magic happens, data received can be Enriched and Fine Grained thanks to [Topic Views](https://docs.pushtechnology.com/docs/6.5.2/manual/html/designguide/data/topictree/topic_views.html), allowing Clients to consume only relevant data and increasing data efficiency.
 ## Client Tier
 Finally we have a Diffusion client, consuming from the Diffusion Topic and showing in the chart the values it received.
+
+# The code in Action
 
 
 

@@ -24,12 +24,10 @@ Finally we have a Diffusion client, consuming from the Diffusion Topic and showi
 # The code in Action
 
 ## Connecting to diffusion
-Connecting is very easy, this is the function a consumer class in JS calls to connect. Read the comments in the function to understand what it does.
-
-1. Connecting to Diffusion
+1. Connecting is very easy, this is the function a consumer class in JS calls to connect. Read the comments in the function to understand what it does.
 ![](./images/connect.png)
 
-2. Subscribing to a Topic
+2. After connecting, in order to start consuming from the Topic, we must subscribe to it, using the following function.
 ![](./images/subscribe.png)
 
 # Pre-requisites

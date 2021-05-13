@@ -4,7 +4,23 @@ Introduction to Diffusion Real-Time Event Stream through a simple application us
 
 This JavaScript code example will help you publish external data on real-time from a public API to Redis, consume from it and transform data on-the-fly via our powerful [Topic Views](https://docs.pushtechnology.com/docs/6.5.2/manual/html/designguide/data/topictree/topic_views.html) feature. You can also use other programming languages from our [SDKs](https://docs.pushtechnology.com/#sdks), including iOS, Android, C, .NET, and more. 
 
-# Acquiring data from 
+# What this tutorial does
+## General Schema
+![](./redis-app/images/schema.png)
+## Market data
+For the purposes of this tutorial, we are going to be using the [Coindesk API](https://api.coindesk.com/v1/bpi/currentprice.json) to retrieve Bitcoin current value, in USD, Euros and GBP. 
+We connect the that API and as we receive it's response, we feed it into the Data Tier (Redis Service).
+## Data Tier
+In Redis we created a Topic to stream that data through, and we created a Redis Client to consume from the same channel. The client then shows a chart displaying the values consumed from Redis.  
+## Application Tier
+This is where data collected in redis is, published to Diffusion.
+### Redis publisher
+The redis publisher, which is consuming data from the Redis Topic, in turn, publishes the same content to a Topic in Diffusion.
+## Client Tier
+Finally we have a Diffusion client, consuming from the Diffusion Topic and showing in the chart the values it received.
+
+
+
 # Pre-requisites
 
 *  Download our code examples or clone them to your local environment:

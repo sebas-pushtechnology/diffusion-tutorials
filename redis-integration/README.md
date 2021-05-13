@@ -8,21 +8,21 @@ This JavaScript code example will help you publish external data on real-time fr
 ## General Schema
 ![](./redis-app/images/schema.png)
 ## Market data
-![](./images/market-data.png)
+![](./images/market-data.png)  
 For the purposes of this tutorial, we are going to be using the [Coindesk API](https://api.coindesk.com/v1/bpi/currentprice.json) to retrieve Bitcoin current value, in USD, Euros and GBP. 
 We connect the that API and as we receive it's response, we feed it into the Data Tier (Redis Service).
 ## Data Tier
-![](./images/data-tier.png)
+![](./images/data-tier.png)  
 In Redis we created a Topic to stream that data through, and we created a Redis Client to consume from the same channel. The client then shows a chart displaying the values consumed from Redis.  
 ## Application Tier
-![](./images/application-tier.png)
+![](./images/application-tier.png)  
 This is where data collected in redis is, published to Diffusion.
 ### Redis publisher
 The redis publisher, which is consuming data from the Redis Topic, in turn, publishes the same content to a Topic in Diffusion.
 ### Diffusion Server
 This is where the magic happens, data received can be Enriched and Fine Grained thanks to [Topic Views](https://docs.pushtechnology.com/docs/6.5.2/manual/html/designguide/data/topictree/topic_views.html), allowing Clients to consume only relevant data and increasing data efficiency.
 ## Client Tier
-![](./images/client-tier.png)
+![](./images/client-tier.png)  
 Finally we have a Diffusion client, consuming from the Diffusion Topic and showing in the chart the values it received.
 
 # The code in Action

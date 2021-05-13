@@ -10,6 +10,13 @@ export default class Diffusion {
         this.onReceiveMessageCallback = onReceiveMessageCallback || null;
     }
 
+    /**
+     * This method is used to configure Diffusion connection
+     * @param host The host of the Diffusion Service
+     * @param user The user to the Diffusion Service
+     * @param password
+     * @param topic The topic name to be created and consumer from
+     */
     setConfig = ({ host, user, password, topic }) => {         
         this.host = host || '127.0.0.1';
         this.user = user || 'admin';
@@ -18,7 +25,11 @@ export default class Diffusion {
         this.subscribedTopic = topic || 'default-topic';
     }
 
+    /**
+     * Method that handles connection to the Diffusion Service      
+     */
     connect = () => {
+        /* Connect to Diffusion using the parameters previously set in setConfig method */
         diffusion.connect({
             host: this.host,            
             principal: this.user,
@@ -27,27 +38,39 @@ export default class Diffusion {
             secure: true
         }).then((session) => {
             this.session = session;
+            /* Here's where we add the topic we are going to be using */
             this.session.topics.add(this.topic, diffusion.topics.TopicType.JSON)            
             console.log(`Connected: `, this.session.sessionId);
+
+            /* If we setup a connected callback, let's call it */
             if (this.onConnectedCallback) {
                 this.onConnectedCallback();
             }            
         });
     }
 
+    /* Method to set topic to publish to and consume from */
     setTopic = topic => { this.topic = topic; }
 
+    /**
+     * Method to subscribe to a topic and start consuming it
+     * @param session We can pass an already existing session, otherwise it will use the internal one
+     * @param topicPath Set a topic to subscribe to, if empty uses the internal one
+     * @param onValueCallback callback to be called when a value is arrives in the topic. It can be null
+     */
     subscribe = ({ session = undefined, topicPath = '', onValueCallback = null }) => {
         const currentSession = session || this.session;
         const currentTopic = topicPath || this.topic;
         console.log(`subscribing to: ${currentTopic}`);
         
+        /* We Setup the stream */
         currentSession.addStream(
             currentTopic,
             diffusion.datatypes.json()).on('value',
                 onValueCallback || this.onReceiveMessage
             );
 
+        /* And subscribe to the topic */
         currentSession.select(currentTopic);
     }
 

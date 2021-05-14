@@ -11,46 +11,53 @@
   </head>
   <body>    
     <div class="vertical-center">        
-        <div class="container-fluid" style="background-color: blue;">            
+        <div class="container-fluid">            
             <a class="d-block text-center" href="https://www.pushtechnology.com">
                 <img src="./images/diffusion-logo.png" height="80">
             </a>
             <div class="row">
               <div class="col">
-                <h5 class="text-white">General Schema</h5>
+                <h5 class="tier-title">General Schema</h5>
                 <img src="images/schema.png" style="background-size: cover;" class="rounded mx-auto d-block">
               </div>
               
             </div>
             <hr>
             <div class="row p-2">
-                <div class="col-md-6 text-white p-1" style="background-color: blue; background-image: url(./images/cloud-overview-header.jpg); background-size:cover; background-repeat: no-repeat; background-position: center;">                            
-                  <div style="height: 180px; padding: 10px;">
-                    <label for="name" style="color:White;">1. This is the Market data: Data injected into Redis (Data Tier)</label><br>
-                    <a href="#" class="btn btn-diffusion text-white btn-sm" id="startPolling">Get Bitcoin Values</a>
-                    <pre class="json text" style="background-color: white; max-height: 500px" id="responseValue"></pre>
+                <div class="col-md-6 border-end p-2">
+                  <div style="height: 250px; padding: 10px;">
+                    <h5 class="tier-title smaller">Market Data</h5>
+                    <label for="name" class="mb-2"><span class="rounded-number">1</span> This is the Market data: Data injected into Redis (Data Tier)</label><br>
+                    <a href="#" class="btn btn-diffusion btn-sm text-white" id="startPolling">Get Bitcoin Values</a>
+                    <pre class="json text mt-2" style="background-color: white; height: 150px;" id="responseValue"></pre>
                   </div>
                   <hr>
-                  <p>2. Redis (Data Tier): Here's the Data Tier Client, showing the data received in Redis from the Bitcoin API (Market data)</p>
-                  <div id="chartDiv" style="height: 300px;"></div>
+                  <h5 class="tier-title smaller">Data Tier</h5>
+                  <p><span class="rounded-number">2</span> Redis (Data Tier): Here's the Data Tier Client, showing the data received in Redis from the Bitcoin API (Market data)</p>
+                  <div id="chartDiv" class="border" style="height: 300px;"></div>
                 </div>
-                <div class="col-md-6 text-white p-1" style="background-color: blue; background-image: url(./images/cloud-overview-header.jpg); background-size:cover; background-repeat: no-repeat; background-position: center;">
-                  <div style="height: 180px; padding: 10px;">
-                    <label for="name" style="color:White;">3. Diffusion Service (Application Tier): The Data Tier, publishes received data into Diffusion.</label>
-                    <div class="input-group">
-                        <span class="input-group-text">
-                        <i class="fa fa-cloud"></i>
-                        </span>
-                        <input class="form-control" id="host" name="host" value="redis-tutorial.us.diffusion.cloud" type="text">
-                    </div>                        
-                    <input class="form-control" id="user" name="user" value="redis-tutorial" type="text">
-                    <input class="form-control" id="password" name="password" value="password" type="text">                    
-                    <a href="https://management.ad.diffusion.cloud/" style="color:White;">Don't have one? Click here to create your service!</a>
-                    <a href="#" class="btn btn-diffusion text-white btn-block mt-1" id="connectToDiffusion" type="button" style="background-color:#3d3d3d;">Connect to Diffusion</a>
+                <div class="col-md-6 p-2">
+                  <div style="height: 250px; padding: 10px;">
+                    <h5 class="tier-title smaller">Application Tier</h5>
+                    <label for="name" class="mb-2"><span class="rounded-number">3</span> Diffusion Service (Application Tier): The Data Tier, publishes received data into Diffusion.</label>                    
+                    <div class="mb-2">
+                      <div class="input-group">
+                          <span class="input-group-text">
+                          <i class="fa fa-cloud"></i>
+                          </span>
+                          <input class="form-control" id="host" name="host" value="redis-tutorial.us.diffusion.cloud" type="text">
+                      </div>                        
+                    
+                      <input class="form-control" id="user" name="user" value="redis-tutorial" type="text">
+                      <input class="form-control" id="password" name="password" value="password" type="text">                    
+                    </div>
+                    <a href="https://management.ad.diffusion.cloud/">Don't have one? Click here to create your service!</a>
+                    <a href="#" class="btn btn-diffusion btn-block mt-1 text-white" id="connectToDiffusion" type="button">Connect to Diffusion</a>
                   </div>
                   <hr>
-                  <p>4. Client Tier: Here where we display data obtained from the subscribed topic in Diffusion:</p>
-                  <div id="diffusionChartDiv" style="height: 300px;"></div>
+                  <h5 class="tier-title smaller">Client Tier</h5>
+                  <p><span class="rounded-number">4</span> Client Tier: Here where we display data obtained from the subscribed topic in Diffusion:</p>
+                  <div id="diffusionChartDiv" class="border" style="height: 300px;"></div>
                 </div>
             </div>
         </div>

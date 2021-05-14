@@ -140,11 +140,16 @@ export default class RedisConsumer {
 
     // Diffusion Section specific methods -------------------------------------------------------
 
+    /**
+     * This is the event handler when the Connect to Diffusion button is clicked
+     * @param {*} evt 
+     */
     onDiffusionConnectBtnClicked = evt => {
         console.log('Connecting to Diffusion');
         evt.preventDefault();
 
         // Instatiate Diffusion's Client
+        // We send the connect and on message callbacks to handle those events
         this.diffusionClient = new Diffusion(this.onConnectedToDiffusion, this.onDiffusionMessage);
         
         // Set diffusion config
@@ -159,12 +164,21 @@ export default class RedisConsumer {
         this.diffusionClient.connect();
     }
 
+    /**
+     * This is the callback, Diffusion client calls after connection
+     */
     onConnectedToDiffusion = () => {
         console.log('connected to diffusion');
         // Once we're connected, subscribe to the topic we specified when connecting to Diffusion service
+        // We're not sending any parameters because we already set those when calling the setConfig function in the previous method.
         this.diffusionClient.subscribe({}); //Subscribe to Diffusion's topic
     }
 
+    /**
+     * This is the callback the Diffusion Client calls when a message is received
+     * We update the Client Tier chart with this info
+     * @param {*} message 
+     */
     onDiffusionMessage = message => {
         console.log('on Diffusion message', message);
         // This message came from Diffusion! Feed Diffusion's Chart

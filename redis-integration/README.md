@@ -94,6 +94,55 @@ Finally we have a Diffusion client, consuming from the Diffusion Topic and showi
     }
 ```
 
+3. This is the consumer class, it uses the Diffusion Client's functions, described above, to get the Web Client going.
+
+```javascript
+/**
+     * This is the event handler when the Connect to Diffusion button is clicked
+     * @param {*} evt 
+     */
+    onDiffusionConnectBtnClicked = evt => {
+        console.log('Connecting to Diffusion');
+        evt.preventDefault();
+
+        // Instatiate Diffusion's Client
+        // We send the connect and on message callbacks to handle those events
+        this.diffusionClient = new Diffusion(this.onConnectedToDiffusion, this.onDiffusionMessage);
+        
+        // Set diffusion config
+        this.diffusionClient.setConfig({
+            host: this.hostEl.value,
+            user: this.userEl.value,
+            password: this.passwordEl.value,
+            topic: this.topic
+        });
+
+        // And connect to it
+        this.diffusionClient.connect();
+    }
+
+    /**
+     * This is the callback, Diffusion client calls after connection
+     */
+    onConnectedToDiffusion = () => {
+        console.log('connected to diffusion');
+        // Once we're connected, subscribe to the topic we specified when connecting to Diffusion service
+        // We're not sending any parameters because we already set those when calling the setConfig function in the previous method.
+        this.diffusionClient.subscribe({}); //Subscribe to Diffusion's topic
+    }
+
+    /**
+     * This is the callback the Diffusion Client calls when a message is received
+     * We update the Client Tier chart with this info.
+     * @param {*} message 
+     */
+    onDiffusionMessage = message => {
+        console.log('on Diffusion message', message);
+        // This message came from Diffusion! Feed Diffusion's Chart
+        this.updateChart(message, this.diffusionChart);
+    }
+```
+
 # Pre-requisites
 
 *  Download our code examples or clone them to your local environment:

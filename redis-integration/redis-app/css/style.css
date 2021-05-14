@@ -53,15 +53,18 @@ ul.messages.list-group {
 
 .rounded-number {
   display: inline-block;
-  border: 1px solid #2F99F5;
+  border: 3px solid rgb(250, 116, 39);
   border-radius: 50%;
-  width: 25px;
-  height: 25px;
+  width: 35px;
+  height: 35px;
   text-align: center;  
+  margin-bottom: 5px;
 }
 
 .tier-title {
-  color: #2E6D88;
+  font-size: 1.2rem;
+  color: #0c87d4;
+  font-weight: 600;
 }
 
 .tier-title.smaller {

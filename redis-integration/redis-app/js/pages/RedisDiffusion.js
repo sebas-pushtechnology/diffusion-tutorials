@@ -148,11 +148,11 @@ export default class RedisConsumer {
         console.log('Connecting to Diffusion');
         evt.preventDefault();
 
-        // Instatiate Diffusion's Client
+        // Instantiate Diffusion's Client
         // We send the connect and on message callbacks to handle those events
         this.diffusionClient = new Diffusion(this.onConnectedToDiffusion, this.onDiffusionMessage);
         
-        // Set diffusion config
+        // Set Diffusion config
         this.diffusionClient.setConfig({
             host: this.hostEl.value,
             user: this.userEl.value,

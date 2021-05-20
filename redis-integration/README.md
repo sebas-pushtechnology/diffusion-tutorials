@@ -277,7 +277,6 @@ publishData(data) {
 }
 ```
 
-
 # Pre-requisites
 
 *  Download our code examples or clone them to your local environment:

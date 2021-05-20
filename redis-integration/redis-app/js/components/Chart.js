@@ -28,4 +28,15 @@ export default class Chart {
     getChart = () => {
         return this.chart;
     }
+
+    /**
+     * Updates chart with data from the external API
+     * @param {*} data 
+     */
+    updateChart = (data) => {
+        // Feed values into the chart
+        this.chart.series(0).points.add({ y: parseFloat(data.bpi.USD.rate_float), x: data.time.updated });
+        this.chart.series(1).points.add({ y: parseFloat(data.bpi.GBP.rate_float), x: data.time.updated });
+        this.chart.series(2).points.add({ y: parseFloat(data.bpi.EUR.rate_float), x: data.time.updated });
+    }
 }

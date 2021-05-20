@@ -53,7 +53,7 @@ export default class DiffusionService {
     onDiffusionMessage = message => {
         console.log('on Diffusion message', message);
         // This message came from Diffusion! Feed Diffusion's Chart
-        this.updateChart(message, this.diffusionChart);
+        this.chart.updateChart(message);
     }
 
     /**

@@ -15,7 +15,7 @@ export default class RedisDiffusion {
         this.redisService.setTargetChart(new Chart('chartDiv'));
         
         // Instantiate Coindesk Poller (Market Data)
-        this.coindeskPoller = new CoindeskPoller();
+        this.coindeskPoller = new CoindeskPoller(this.apiResponseBodyEl);
         this.coindeskPoller.setRedisService(this.redisService);
 
         // Instantiate Diffusion Service (Aplication Tier)

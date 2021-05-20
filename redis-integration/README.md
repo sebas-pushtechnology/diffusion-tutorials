@@ -26,8 +26,168 @@ This is where the magic happens, data received can be Enriched and Fine Grained 
 Finally we have a Diffusion client, consuming from the Diffusion Topic and showing in the chart the values it received.
 
 # The code in Action
+
+## How it works
+
+### Redis and Web Servers
+We use [docker](./redis-app/docker-compose.yaml) to setup and run a Redis Server and a Web Server to host the web application.  
+
+### Redis NodeJS Server
+To interface with the Redis Server, we built a NodeJS [Server](./redis-app/js/redis-server/redis-server.js). This App runs **server side** next to the Redis Server.
+
+   1. The NodeJS Server will connect to the Redis Server and create and use a Topic, to stream data through. To perform this interaction, both **redisPublisher** and a **redisConsumer** clients are instantiated
+   2. To communicate with the Web App (a client), it will open a connection to a WebSocket. We use port 3000.
+   3. Every data that is consumed from the WebSocket is published to the Redis Server's Topic by the redisPublisher
+   4. Every data consumed from Redis Server with the redisConsumer object is, in turn, published to the WebSocket.
+
+This is the piece of code that represents that interaction:
+
+```javascript
+server.on('connection', function connection(ws) {
+    // Message Received in Socket from webclient, and sent to redis
+    ws.on('message', function (event) {
+        console.log('Message from Websocket:', event);
+        redisPublisher.publish(REDIS_CHANNEL, event);
+    });
+
+    // Message received from Redis, and sent through Websocket to Webclients
+    redisSubscriber.on('message', function (channel, message) {
+        console.log('Redis Subscriber: ', channel, message);
+        ws.send(message);
+    })
+});
+```
+
+## The WebClient
+
+The WebClient consists of three main Services:
+
+[**CoindeskPoller**](./redis-app/js/services/CoindeskPoller.js): This Service interacts with [Coindesk](https://api.coindesk.com/v1/bpi/currentprice.json), by polling data from its API and publishing it to Redis.
+
+```javascript
+/**
+* The function that handles the call to the API when polling
+*/
+callEndpoint = async () => {
+    const response = await fetch(this.apiUrl);
+    const contentLength = response.headers.get("content-length");
+    const data = await response.json();
+    // Show the data from the API in the response element
+    const formatter = new JSONFormatter(data);
+    this.apiResponseBodyEl.innerHTML = '';
+    this.apiResponseBodyEl.appendChild(formatter.render());
+    
+    // Publish polled data to Redis
+    this.redisService.publish(data);
+}
+```
+
+[**RedisService**](./redis-app/js/services/RedisService.js): This Service acts as a bridge, receiving data from *CoindeskPoller* and publishing it to Diffusion. It also feeds data received from Coindesk into the Redis Chart. *RedisService* uses **WebSockets** to interact with the [**Redis NodeJS Server**](./redis-app/js/redis-server/redis-server.js), as explained before.
+
+```javascript
+/**
+ * Add the websocket listener to listen for Redis Messages
+ */
+startListeningRedisWebSocket = () => {
+    this.redisWebSocket.onmessage = ({ data }) => {
+        this.message = JSON.parse(data); // Parse the data from Redis
+        console.log('Data received from Redis: ', this.message);
+        this.updateChart(this.message); // Feed the Redis graph with it
+        
+        // Publish received data to Diffusion
+        this.publishToDiffusion(this.message);
+    }
+}
+```
+
+[**DiffusionService**](./redis-app/js/services/DiffusionService.js): This Service, in turn, receives data published by *RedisService* from the Diffusion Topic we've set up, and feeds Diffusion's Chart:
+
+```javascript
+/**
+ * This is the callback the Diffusion Client calls when a message is received
+ * We update the Client Tier chart with this info
+ * @param {*} message 
+ */
+onDiffusionMessage = message => {
+    console.log('on Diffusion message', message);
+    // This message came from Diffusion! Feed Diffusion's Chart
+    this.updateChart(message, this.diffusionChart);
+}
+```
+
 ## Connecting to diffusion
-1. Connecting is very easy, this is the function a consumer class in JS calls to connect. Read the comments in the function to understand what it does.
+
+In the previous section, we described how the different Web Application Services interact. Now we'll describe, how the Diffusion Service interacts with the Diffusion Client to Consumer and Publish through it. Connecting is very easy, read the comments in code to understand what it does.
+
+### Functions in DiffusionService
+
+#### Connectig to Diffusion
+
+```javascript
+/**
+ * This is the event handler when the Connect to Diffusion button is clicked
+ * @param {*} evt 
+ */
+connect = (
+    host, user, password, topic
+) => {
+    console.log('Connecting to Diffusion');        
+
+    // Instantiate Diffusion's Client
+    // We send the connect and on message callbacks to handle those events
+    this.diffusionClient = new Diffusion(this.onConnectedToDiffusion, this.onDiffusionMessage);
+
+    // Set Diffusion config
+    this.diffusionClient.setConfig({
+        host: host,
+        user: user,
+        password: password,
+        topic: topic
+    });
+
+    // And connect to it
+    this.diffusionClient.connect();
+}
+
+/**
+ * This is the callback, Diffusion client calls after connection
+ */
+onConnectedToDiffusion = () => {
+    console.log('connected to diffusion');
+    // Once we're connected, subscribe to the topic we specified when connecting to Diffusion service
+    // We're not sending any parameters because we already set those when calling the setConfig function in the previous method.
+    this.diffusionClient.subscribe({}); //Subscribe to Diffusion's topic
+}
+```
+
+#### Publishing to Diffusion
+
+```javascript
+/**
+ * Publish to diffusion
+ * @param {*} data 
+ */
+publish = data => {
+    this.diffusionClient.publishData(data);
+}
+```
+#### Consuming from Diffusion
+
+```javascript
+/**
+ * This is the callback the Diffusion Client calls when a message is received
+ * We update the Client Tier chart with this info
+ * @param {*} message 
+ */
+onDiffusionMessage = message => {
+    console.log('on Diffusion message', message);
+    // This message came from Diffusion! Feed Diffusion's Chart
+    this.updateChart(message, this.diffusionChart);
+}
+```
+
+### Diffusion Client functions
+
 ```javascript
 /**
      * This method is used to configure Diffusion connection
@@ -69,7 +229,8 @@ Finally we have a Diffusion client, consuming from the Diffusion Topic and showi
     }
 ```
 
-2. After connecting, in order to start consuming from the Topic, we must subscribe to it, using the following function.
+After connecting, in order to start consuming from the Topic, we must subscribe to it, using the following function.
+
 ```javascript
 /**
      * Method to subscribe to a topic and start consuming it
@@ -86,62 +247,36 @@ Finally we have a Diffusion client, consuming from the Diffusion Topic and showi
         currentSession.addStream(
             currentTopic,
             diffusion.datatypes.json()).on('value',
+                /* Call the function to process the received data */
                 onValueCallback || this.onReceiveMessage
             );
 
         /* And subscribe to the topic */
         currentSession.select(currentTopic);
     }
+
+    /* This is the function that processes data from Diffusion and calls the Consumer's Callback, if set. */
+    onReceiveMessage = (topic, specification, newValue, oldValue) => {
+        let message = newValue.get();
+        message.receiveTime = new Date();
+        console.log(`TOPIC - Receiving message for topic: ${topic}`, specification, newValue.get(), oldValue.get());
+        if (this.onReceiveMessageCallback) {
+            this.onReceiveMessageCallback(message, topic);
+        }
+    }
 ```
 
-3. This is the consumer class, it uses the Diffusion Client's functions, described above, to get the Web Client going.
+This is the function that Publishes to Diffusion:
 
 ```javascript
-/**
-     * This is the event handler when the Connect to Diffusion button is clicked
-     * @param {*} evt 
-     */
-    onDiffusionConnectBtnClicked = evt => {
-        console.log('Connecting to Diffusion');
-        evt.preventDefault();
-
-        // Instantiate Diffusion's Client
-        // We send the connect and on message callbacks to handle those events
-        this.diffusionClient = new Diffusion(this.onConnectedToDiffusion, this.onDiffusionMessage);
-        
-        // Set Diffusion config
-        this.diffusionClient.setConfig({
-            host: this.hostEl.value,
-            user: this.userEl.value,
-            password: this.passwordEl.value,
-            topic: this.topic
-        });
-
-        // And connect to it
-        this.diffusionClient.connect();
+publishData(data) {        
+    if (this.session) {
+        /* Use the set SDK function to publish to a specific topic */
+        this.session.topicUpdate.set(this.topic, diffusion.datatypes.json(), data);
     }
-
-    /**
-     * This is the callback, Diffusion client calls after connection
-     */
-    onConnectedToDiffusion = () => {
-        console.log('connected to diffusion');
-        // Once we're connected, subscribe to the topic we specified when connecting to Diffusion service
-        // We're not sending any parameters because we already set those when calling the setConfig function in the previous method.
-        this.diffusionClient.subscribe({}); //Subscribe to Diffusion's topic
-    }
-
-    /**
-     * This is the callback the Diffusion Client calls when a message is received
-     * We update the Client Tier chart with this info.
-     * @param {*} message 
-     */
-    onDiffusionMessage = message => {
-        console.log('on Diffusion message', message);
-        // This message came from Diffusion! Feed Diffusion's Chart
-        this.updateChart(message, this.diffusionChart);
-    }
+}
 ```
+
 
 # Pre-requisites
 

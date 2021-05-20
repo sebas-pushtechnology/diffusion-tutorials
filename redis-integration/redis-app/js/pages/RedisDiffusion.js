@@ -25,7 +25,7 @@ export default class RedisDiffusion {
         // We set diffusion service into redis service for publishing data.
         this.redisService.setDiffusionService(this.diffusionService);
                 
-        // Data tier is represented by the Diffusion Chart
+        // Client tier is represented by the Diffusion Chart
 
         // Add Buttons event listeners
         this.setEvents(); 

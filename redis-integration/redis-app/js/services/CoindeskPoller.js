@@ -25,10 +25,7 @@ export default class CoindeskPoller {
     /**
      * Start Polling function. Here is where the interaction with the external API is handled
      */
-    startPolling = () => {
-        // When we start polling we start listening for the websocket where Redis Data will come in
-        this.startListeningWs();
-
+    startPolling = () => {        
         // We instantiate and start the poller
         const poller = poll({
             fn: this.callEndpoint, // This is the function that will handle data from the API

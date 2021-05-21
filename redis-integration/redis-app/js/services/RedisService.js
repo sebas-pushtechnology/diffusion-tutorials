@@ -15,14 +15,18 @@ export default class RedisService {
      */
     startListeningRedisWebSocket = () => {
         this.redisWebSocket.onmessage = ({ data }) => {
+            console.log(data);
             this.message = JSON.parse(data); // Parse the data from Redis
             console.log('Data received from Redis: ', this.message);
+                        
+            this.chart.updateDataReceived(data.length);
+            
             this.chart.updateChart(this.message); // Feed the Redis graph with it
             
             // Publish received data to Diffusion
             this.publishToDiffusion(this.message);
         }
-    }    
+    }        
 
     /**
      * Sends data to the Redis Server

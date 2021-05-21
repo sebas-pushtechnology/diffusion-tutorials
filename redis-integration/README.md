@@ -6,7 +6,7 @@ This JavaScript code example will help you publish external data on real-time fr
 
 # What this tutorial does
 ## General Schema
-![](./redis-app/images/schema.png)
+![](./redis-app/images/schema-v2.png)
 ## Market data
 ![](./images/market-data.png)  
 For the purposes of this tutorial, we are going to be using the [Coindesk API](https://api.coindesk.com/v1/bpi/currentprice.json) to retrieve Bitcoin current value, in USD, Euros and GBP. 

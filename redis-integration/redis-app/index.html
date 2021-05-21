@@ -19,7 +19,7 @@
               <div class="col-2">&nbsp;</div>
               <div class="col-8">
                 <h5 class="tier-title">General Schema</h5>
-                <img src="images/schema.png" style="background-size: cover;" class="img-fluid rounded mx-auto d-block">
+                <img src="images/schema-v2.png" style="background-size: cover;" class="img-fluid rounded mx-auto d-block">
               </div>
               
             </div>
@@ -37,6 +37,7 @@
                   <div class="rounded-number tier-title">2</div>
                   <h5 class="tier-title">Data Tier</h5>
                   <p>Redis (Data Tier): Here's the Data Tier Client, showing the data received in Redis from the Bitcoin API (Market data)</p>
+                  <h5>Data Received: <span id="redisDataReceived" class="font-weight-bold text-info">0</span> bytes</h5>
                   <div id="chartDiv" class="border" style="height: 300px;"></div>
                 </div>
                 <div class="col-md-6 p-2">
@@ -62,6 +63,7 @@
                   <div class="rounded-number tier-title">4</div>
                   <h5 class="tier-title">Client Tier</h5>
                   <p>Client Tier: Here where we display data obtained from the subscribed topic in Diffusion:</p>
+                  <h5>Data Received: <span id="diffusionDataReceived" class="font-weight-bold text-success">0</span> bytes</h5>
                   <div id="diffusionChartDiv" class="border" style="height: 300px;"></div>
                 </div>
             </div>

@@ -12,7 +12,7 @@ export default class RedisDiffusion {
 
         // Instantiate Redis Service (Data Tier)
         this.redisService = new RedisService();
-        this.redisService.setTargetChart(new Chart('chartDiv'));
+        this.redisService.setTargetChart(new Chart('chartDiv', 'redisDataReceived'));
         
         // Instantiate Coindesk Poller (Market Data)
         this.coindeskPoller = new CoindeskPoller(this.apiResponseBodyEl);
@@ -20,7 +20,7 @@ export default class RedisDiffusion {
 
         // Instantiate Diffusion Service (Aplication Tier)
         this.diffusionService = new DiffusionService();
-        this.diffusionService.setTargetChart(new Chart('diffusionChartDiv'));
+        this.diffusionService.setTargetChart(new Chart('diffusionChartDiv', 'diffusionDataReceived'));
 
         // We set diffusion service into redis service for publishing data.
         this.redisService.setDiffusionService(this.diffusionService);

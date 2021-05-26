@@ -1,17 +1,17 @@
 import { poll } from "./poller.js";
 
-export default class CoindeskPoller {
+export default class DataFeeder {
     constructor(responseBodyEl) {
         this.apiUrl = 'https://api.coindesk.com/v1/bpi/currentprice.json';
         this.polling = false;
-        this.redisService = null;
+        this.backendService = null;
         this.responseBodyEl = responseBodyEl;
     }
 
     // Sets the API URL
     setApiUrl = apiUrl => this.apiUrl = apiUrl;
 
-    setRedisService = redisService => this.redisService = redisService;
+    setBackendService = backendService => this.backendService = backendService;
 
     /**
      * Start polling, when the start polling button was clicked
@@ -63,6 +63,6 @@ export default class CoindeskPoller {
         this.responseBodyEl.appendChild(formatter.render());
         
         // Publish polled data to Redis
-        this.redisService.publish(data);
+        this.backendService.publish(data);
     }
 }

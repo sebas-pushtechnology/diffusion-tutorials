@@ -6,7 +6,7 @@ This JavaScript code example will help you publish external data on real-time fr
 
 # What this tutorial does
 ## General Schema
-![](./redis-app/images/schema-v2.png)
+![](./redis-app/images/redis-schema.png)
 ## Market data
 ![](./images/market-data.png)  
 For the purposes of this tutorial, we are going to be using the [Coindesk API](https://api.coindesk.com/v1/bpi/currentprice.json) to retrieve Bitcoin current value, in USD, Euros and GBP. 
@@ -62,7 +62,7 @@ server.on('connection', function connection(ws) {
 
 The WebClient consists of three main Services:
 
-[**CoindeskPoller**](./redis-app/js/services/CoindeskPoller.js): This Service interacts with [Coindesk](https://api.coindesk.com/v1/bpi/currentprice.json), by polling data from its API and publishing it to Redis.
+[**DataFeeder**](./redis-app/js/services/DataFeeder.js): This Service interacts with [Coindesk](https://api.coindesk.com/v1/bpi/currentprice.json), by polling data from its API and publishing it to Redis.
 
 ```javascript
 /**
@@ -78,11 +78,11 @@ callEndpoint = async () => {
     this.apiResponseBodyEl.appendChild(formatter.render());
     
     // Publish polled data to Redis
-    this.redisService.publish(data);
+    this.backendService.publish(data);
 }
 ```
 
-[**RedisService**](./redis-app/js/services/RedisService.js): This Service acts as a bridge, receiving data from *CoindeskPoller* and publishing it to Diffusion. It also feeds data received from Coindesk into the Redis Chart. *RedisService* uses **WebSockets** to interact with the [**Redis NodeJS Server**](./redis-app/js/redis-server/redis-server.js), as explained before.
+[**BackendService**](./redis-app/js/services/BackendService.js): This Service acts as a bridge, receiving data from *DataFeeder* and publishing it to Diffusion. It also feeds data received from Coindesk into the [RedisClient](./redis-app/js/components/RedisClient.js) Chart. *BackendService* uses **WebSockets** to interact with the [**Redis NodeJS Server**](./redis-app/js/redis-server/redis-server.js), as explained before.
 
 ```javascript
 /**
@@ -92,15 +92,25 @@ startListeningRedisWebSocket = () => {
     this.redisWebSocket.onmessage = ({ data }) => {
         this.message = JSON.parse(data); // Parse the data from Redis
         console.log('Data received from Redis: ', this.message);
-        this.updateChart(this.message); // Feed the Redis graph with it
+        
+        this.updateClient(data); // Feed the Redis graph with it
         
         // Publish received data to Diffusion
         this.publishToDiffusion(this.message);
     }
 }
+
+/**
+ * Updates Client with received data
+ * @param {*} data 
+ */
+updateClient = data => {
+    this.chart.updateDataReceived(data.length);
+    this.chart.updateChart(this.message); // Feed the Redis graph with it
+}
 ```
 
-[**DiffusionService**](./redis-app/js/services/DiffusionService.js): This Service, in turn, receives data published by *RedisService* from the Diffusion Topic we've set up, and feeds Diffusion's Chart:
+[**DiffusionService**](./redis-app/js/services/DiffusionService.js): This Service, in turn, receives data published by the *BackendService* to the Diffusion Topic we've set up, and feeds [DiffusionClient](./redis-app/js/components/DiffusionClient.js) Chart:
 
 ```javascript
 /**
@@ -110,6 +120,8 @@ startListeningRedisWebSocket = () => {
  */
 onDiffusionMessage = message => {
     console.log('on Diffusion message', message);
+    
+    this.chart.updateDataReceived(JSON.stringify(message).length);
     // This message came from Diffusion! Feed Diffusion's Chart
     this.updateChart(message, this.diffusionChart);
 }
@@ -117,7 +129,7 @@ onDiffusionMessage = message => {
 
 ## Connecting to diffusion
 
-In the previous section, we described how the different Web Application Services interact. Now we'll describe, how the Diffusion Service interacts with the Diffusion Client to Consumer and Publish through it. Connecting is very easy, read the comments in code to understand what it does.
+In the previous section, we described how the different Web Application Services interact. Now we'll describe, how the Diffusion Service interacts with the Diffusion Client to Consume and Publish through it. Connecting is very easy, read the comments in code to understand what it does.
 
 ### Functions in DiffusionService
 
@@ -186,7 +198,9 @@ onDiffusionMessage = message => {
 }
 ```
 
-### Diffusion Client functions
+### [Diffusion Client](./redis-app/js/clients/Diffusion.js) functions
+
+This is the client that directly interacts with Diffusion.  
 
 ```javascript
 /**

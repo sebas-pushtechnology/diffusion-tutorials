@@ -1,4 +1,4 @@
-export default class RedisService {
+export default class BackendService {
     constructor() {
         // Lets create a Socket to interact with Redis
         this.redisWebSocket = new WebSocket("ws://127.0.0.1:3000/");
@@ -19,14 +19,21 @@ export default class RedisService {
             this.message = JSON.parse(data); // Parse the data from Redis
             console.log('Data received from Redis: ', this.message);
                         
-            this.chart.updateDataReceived(data.length);
-            
-            this.chart.updateChart(this.message); // Feed the Redis graph with it
+            this.updateClient(data); //Feeds redis graph with data
             
             // Publish received data to Diffusion
             this.publishToDiffusion(this.message);
         }
-    }        
+    }
+    
+    /**
+     * Updates Client with received data
+     * @param {*} data 
+     */
+    updateClient = data => {
+        this.chart.updateDataReceived(data.length);
+        this.chart.updateChart(this.message); // Feed the Redis graph with it
+    }
 
     /**
      * Sends data to the Redis Server

@@ -1,6 +1,7 @@
-import Chart from "../components/Chart.js";
-import CoindeskPoller from "../services/CoindeskPoller.js";
-import RedisService from "../services/RedisService.js";
+import DataFeeder from "../services/DataFeeder.js";
+import BackendService from "../services/BackendService.js";
+import DiffusionClient from "../components/DiffusionClient.js";
+import RedisClient from "../components/RedisClient.js";
 import DiffusionService from "../services/DiffusionService.js";
 
 export default class RedisDiffusion {
@@ -11,21 +12,21 @@ export default class RedisDiffusion {
         this.topic = 'redis/bitcoin';
 
         // Instantiate Redis Service (Data Tier)
-        this.redisService = new RedisService();
-        this.redisService.setTargetChart(new Chart('chartDiv', 'redisDataReceived'));
+        this.backendService = new BackendService();
+        this.backendService.setTargetChart(new RedisClient());
         
-        // Instantiate Coindesk Poller (Market Data)
-        this.coindeskPoller = new CoindeskPoller(this.apiResponseBodyEl);
-        this.coindeskPoller.setRedisService(this.redisService);
+        // Instantiate Data Feeder (Market Data)
+        this.dataFeeder = new DataFeeder(this.apiResponseBodyEl);
+        this.dataFeeder.setBackendService(this.backendService);
 
         // Instantiate Diffusion Service (Aplication Tier)
         this.diffusionService = new DiffusionService();
-        this.diffusionService.setTargetChart(new Chart('diffusionChartDiv', 'diffusionDataReceived'));
+        this.diffusionService.setTargetChart(new DiffusionClient());
 
         // We set diffusion service into redis service for publishing data.
-        this.redisService.setDiffusionService(this.diffusionService);
+        this.backendService.setDiffusionService(this.diffusionService);
                 
-        // Client tier is represented by the Diffusion Chart
+        // Client tier is represented by the Diffusion and Redis Clients
 
         // Add Buttons event listeners
         this.setEvents(); 
@@ -50,8 +51,8 @@ export default class RedisDiffusion {
         // Start polling from API into Redis
         this.startPollBtn.addEventListener('click', evt => {
             evt.preventDefault();
-            this.coindeskPoller.onStartPolling(evt)
-            this.redisService.startListeningRedisWebSocket();
+            this.dataFeeder.onStartPolling(evt)
+            this.backendService.startListeningRedisWebSocket();
         });
 
         // Connect to Diffusion Service
